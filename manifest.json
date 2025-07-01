@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "UMS Helper",
+    "version": "1.0",
+    "description": "Automate UMS course selection",
+    "permissions": ["activeTab", "scripting"],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
