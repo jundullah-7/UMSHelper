@@ -44,7 +44,7 @@ async function selectSections(desiredSections) {
       console.log(`⚠️ [${i + 1}/${desiredSections.length}] Section not found: ${section}`);
     }
 
-    await delay(500); // wait 500ms before selecting the next section
+    await delay(1000); // wait 500ms before selecting the next section
   }
 
   console.log("🎉 All selections attempted.");
