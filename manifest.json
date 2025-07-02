@@ -1,17 +1,18 @@
 {
-    "manifest_version": 3,
-    "name": "UMS Helper",
-    "version": "1.0",
-    "description": "Automate UMS course selection",
-    "permissions": ["activeTab", "scripting"],
-    "action": {
-      "default_popup": "popup.html"
-    },
-    "content_scripts": [
-      {
-        "matches": ["https://ums.seu.edu.bd/"],
-        "js": ["content.js"]
-      }
-    ]
-  }
-  
+  "manifest_version": 3,
+  "name": "UMS Auto Section Selector",
+  "version": "1.0",
+  "description": "Auto selects desired course sections in UMS advising.",
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://ums.seu.edu.bd/*"], 
+      "js": ["content.js"]
+    }
+  ],
+  "host_permissions": ["https://ums.seu.edu.bd/*"]
+}
