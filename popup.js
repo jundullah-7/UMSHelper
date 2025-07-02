@@ -1,3 +1,25 @@
+document.getElementById("run").addEventListener("click", async () => {
+  // Get input text, split by commas, trim spaces
+  const input = document.getElementById("sections").value;
+  const sections = input.split(",").map(s => s.trim()).filter(s => s.length > 0);
+
+  // Get the current active tab (your UMS advising page)
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+  if (!tab) {
+    alert("No active tab found.");
+    return;
+  }
+
+  // Execute the selection script in the active tab
+  chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    func: selectSections,
+    args: [sections],
+  });
+});
+
+// This function runs inside the UMS page context
 async function selectSections(desiredSections) {
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
