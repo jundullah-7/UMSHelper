@@ -1,9 +1,23 @@
-document.getElementById("run").addEventListener("click", async () => {
-  // Get input text, split by commas, trim spaces
-  const input = document.getElementById("sections").value;
-  const sections = input.split(",").map(s => s.trim()).filter(s => s.length > 0);
+document.getElementById("add-course").addEventListener("click", () => {
+  const container = document.getElementById("courses-container");
 
-  // Get the current active tab (your UMS advising page)
+  const div = document.createElement("div");
+  div.className = "course-input";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Enter course code";
+
+  div.appendChild(input);
+  container.appendChild(div);
+});
+
+document.getElementById("run").addEventListener("click", async () => {
+  const inputs = document.querySelectorAll(".course-input input");
+  const sections = Array.from(inputs)
+    .map(input => input.value.trim())
+    .filter(s => s.length > 0);
+
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   if (!tab) {
@@ -11,7 +25,6 @@ document.getElementById("run").addEventListener("click", async () => {
     return;
   }
 
-  // Execute the selection script in the active tab
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
     func: selectSections,
@@ -19,7 +32,7 @@ document.getElementById("run").addEventListener("click", async () => {
   });
 });
 
-// This function runs inside the UMS page context
+// Your selectSections function remains unchanged:
 async function selectSections(desiredSections) {
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -44,7 +57,7 @@ async function selectSections(desiredSections) {
       console.log(`⚠️ [${i + 1}/${desiredSections.length}] Section not found: ${section}`);
     }
 
-    await delay(1000); // wait 500ms before selecting the next section
+    await delay(1000); // safer delay
   }
 
   console.log("🎉 All selections attempted.");
