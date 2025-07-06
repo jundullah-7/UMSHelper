@@ -3,58 +3,74 @@
 <head>
   <title>UMS Auto Selector</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Orbitron', sans-serif;
       margin: 20px;
-      background: #f9fafb;
-      width: 300px;
+      background: #0f0f1a;
+      color: #00ffe1;
+      width: 320px;
     }
 
     h1 {
       text-align: center;
-      font-size: 18px;
-      margin-bottom: 10px;
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #00ffe1;
+      text-shadow: 0 0 10px #00ffe1;
     }
 
     .course-input {
       display: flex;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .course-input input {
       flex: 1;
-      padding: 6px 8px;
-      border: 1px solid #ccc;
+      padding: 8px 10px;
+      background: #1a1a2e;
+      border: 1px solid #00ffe1;
       border-radius: 4px;
+      color: #00ffe1;
+      outline: none;
+      font-size: 14px;
+      box-shadow: 0 0 5px #00ffe1;
     }
 
-    .add-btn, .run-btn {
+    .course-input input::placeholder {
+      color: #00ffe1aa;
+    }
+
+    .btn {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin-top: 10px;
       border: none;
       border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
+      font-size: 14px;
+      background: linear-gradient(45deg, #00ffe1, #7f00ff);
+      color: #0f0f1a;
+      box-shadow: 0 0 10px #7f00ff;
+      transition: transform 0.1s ease-in-out;
     }
 
-    .add-btn {
-      background-color: #3b82f6;
-      color: white;
+    .btn:hover {
+      transform: scale(1.02);
     }
 
-    .run-btn {
-      background-color: #10b981;
-      color: white;
+    .btn:active {
+      transform: scale(0.98);
     }
 
-    .add-btn:hover {
-      background-color: #2563eb;
+    #add-course {
+      background: linear-gradient(45deg, #7f00ff, #00ffe1);
+      color: #0f0f1a;
+      box-shadow: 0 0 10px #00ffe1;
     }
 
-    .run-btn:hover {
-      background-color: #059669;
-    }
   </style>
 </head>
 <body>
@@ -66,8 +82,8 @@
     </div>
   </div>
 
-  <button class="add-btn" id="add-course">+ Add Course</button>
-  <button class="run-btn" id="run">Run Script</button>
+  <button class="btn" id="add-course">+ Add Course</button>
+  <button class="btn" id="run">Run Script</button>
 
   <script src="popup.js"></script>
 </body>

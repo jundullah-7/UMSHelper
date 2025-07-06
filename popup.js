@@ -32,7 +32,6 @@ document.getElementById("run").addEventListener("click", async () => {
   });
 });
 
-// Your selectSections function remains unchanged:
 async function selectSections(desiredSections) {
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
