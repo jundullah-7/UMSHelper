@@ -1,81 +1,102 @@
-// popup.js - improved auto-split-on-comma + paste behavior
-// Assumes your popup.html has:
-// - a container with id="courses-container"
-// - a button with id="add-course"
-// - a button with id="run"
-
+// popup.js
 document.addEventListener("DOMContentLoaded", () => {
-  // Ensure at least one input exists
-  if (!document.querySelector(".course-input")) addCourseInput();
+  const container = document.getElementById("courses-container");
+  const addBtn = document.getElementById("add-course");
+  const runBtn = document.getElementById("run");
+
+  // Ensure at least one input exists and attach handlers
+  let firstInput = container.querySelector(".course-input input");
+  if (!firstInput) firstInput = addCourseInput("", true);
+  attachInputHandlers(firstInput);
 
   // Add-course button
-  document.getElementById("add-course").addEventListener("click", () => {
-    addCourseInput("", true);
+  addBtn.addEventListener("click", () => {
+    const newInput = addCourseInput("", true);
+    attachInputHandlers(newInput);
   });
 
-  // Run script button
-  document.getElementById("run").addEventListener("click", runHandler);
+  // Run button
+  runBtn.addEventListener("click", runHandler);
 });
 
-// Creates a course input block and returns the input element
+/**
+ * Creates a new .course-input block with an input inside.
+ * Returns the input element.
+ */
 function addCourseInput(value = "", focus = false) {
   const container = document.getElementById("courses-container");
 
   const div = document.createElement("div");
   div.className = "course-input";
   div.style.display = "flex";
-  div.style.marginBottom = "10px";
+  div.style.marginBottom = "12px";
 
   const input = document.createElement("input");
   input.type = "text";
   input.placeholder = "Enter course code";
   input.value = value.trim();
   input.style.flex = "1";
-  input.style.padding = "8px 10px";
+  input.style.padding = "10px 14px";
   input.style.borderRadius = "6px";
   input.style.border = "1px solid #e0e0e0";
-
-  // Handle typing commas
-  input.addEventListener("input", (e) => {
-    handleCommaSplit(e.target);
-  });
-
-  // Handle paste (explicit) - we intercept paste so we can split all pasted codes
-  input.addEventListener("paste", (e) => {
-    handlePasteSplit(e, input);
-  });
-
-  // Optional: support pressing Enter to add a new input
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addCourseInput("", true);
-    }
-    // Support Backspace to remove empty input (if there's more than 1)
-    if (e.key === "Backspace" && input.value === "") {
-      const all = Array.from(document.querySelectorAll(".course-input input"));
-      if (all.length > 1) {
-        // remove this block
-        const parent = input.parentElement;
-        parent.remove();
-        // focus previous input if exists
-        const idx = all.indexOf(input);
-        const prev = all[Math.max(0, idx - 1)];
-        if (prev) prev.focus();
-      }
-    }
-  });
+  input.autocomplete = "off";
 
   div.appendChild(input);
   container.appendChild(div);
 
   if (focus) {
+    // small timeout to allow DOM to insert before focusing
     setTimeout(() => input.focus(), 50);
   }
+
   return input;
 }
 
-// If user types a comma inside an input, split and create new inputs for extras
+/**
+ * Attaches the necessary handlers to the input so that:
+ * - typing a comma splits the value into multiple inputs
+ * - pasting multiple comma-separated codes auto-creates inputs
+ * - pressing Enter adds a new input
+ */
+function attachInputHandlers(inputEl) {
+  if (!inputEl) return;
+
+  // input event: watch for comma typed
+  inputEl.addEventListener("input", (e) => {
+    handleCommaSplit(e.target);
+  });
+
+  // paste event: intercept and split pasted text
+  inputEl.addEventListener("paste", (e) => {
+    handlePasteSplit(e, inputEl);
+  });
+
+  // keyboard convenience: Enter -> add new input; Backspace on empty -> remove
+  inputEl.addEventListener("keydown", (e) => {
+    const allInputs = Array.from(document.querySelectorAll(".course-input input"));
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const newInput = addCourseInput("", true);
+      attachInputHandlers(newInput);
+    } else if (e.key === "Backspace" && inputEl.value === "") {
+      // remove input if more than one
+      if (allInputs.length > 1) {
+        const parent = inputEl.parentElement;
+        const idx = allInputs.indexOf(inputEl);
+        parent.remove();
+        // focus previous if exists
+        const newAll = Array.from(document.querySelectorAll(".course-input input"));
+        const prev = newAll[Math.max(0, idx - 1)];
+        if (prev) prev.focus();
+      }
+    }
+  });
+}
+
+/**
+ * If the input's value contains commas, split and create new inputs.
+ * Puts first token into current input and creates subsequent inputs for extras.
+ */
 function handleCommaSplit(inputEl) {
   const val = inputEl.value;
   if (!val.includes(",")) return;
@@ -86,62 +107,61 @@ function handleCommaSplit(inputEl) {
     return;
   }
 
-  // put first part in this input
+  // keep the first part in this input
   inputEl.value = parts.shift();
 
-  // insert remaining parts as new inputs right after this input's block
-  const thisBlock = inputEl.parentElement;
-  let insertAfter = thisBlock;
-  parts.forEach(p => {
-    const newInput = addCourseInput(p, false);
-    // move newly appended block right after current block for nicer order
+  // insert remaining parts immediately after this input's block, preserving order
+  let insertAfter = inputEl.parentElement;
+  for (const part of parts) {
+    const newInput = addCourseInput(part, false);
+    attachInputHandlers(newInput);
+    // move newly created block right after current block
     insertAfter.parentNode.insertBefore(newInput.parentElement, insertAfter.nextSibling);
     insertAfter = newInput.parentElement;
-  });
+  }
 
-  // focus on the last created input
+  // focus last created input
   const allInputs = Array.from(document.querySelectorAll(".course-input input"));
   allInputs[allInputs.length - 1].focus();
 }
 
-// Handle paste event explicitly: split by commas and create inputs
+/**
+ * Handle explicit paste events (intercept clipboard and split)
+ */
 function handlePasteSplit(e, inputEl) {
-  // Try to get clipboard text
   const clipboard = (e.clipboardData || window.clipboardData);
   if (!clipboard) return;
-
   const text = clipboard.getData("text");
   if (!text) return;
 
-  // If text contains a comma, intercept default paste and split
   if (text.includes(",")) {
     e.preventDefault();
+
     const parts = text.split(",").map(p => p.trim()).filter(Boolean);
     if (parts.length === 0) return;
 
-    // Put first part into current input
+    // put first part into current input
     inputEl.value = parts.shift();
 
-    // Insert remaining parts as new inputs right after current input block
-    const thisBlock = inputEl.parentElement;
-    let insertAfter = thisBlock;
-    parts.forEach(p => {
-      const newInput = addCourseInput(p, false);
-      // move new input block to right position
+    // insert the rest right after current block
+    let insertAfter = inputEl.parentElement;
+    for (const part of parts) {
+      const newInput = addCourseInput(part, false);
+      attachInputHandlers(newInput);
       insertAfter.parentNode.insertBefore(newInput.parentElement, insertAfter.nextSibling);
       insertAfter = newInput.parentElement;
-    });
+    }
 
     // focus last created input
     const allInputs = Array.from(document.querySelectorAll(".course-input input"));
     allInputs[allInputs.length - 1].focus();
-  } else {
-    // default paste behavior if no comma
-    // allow browser to paste normally (do nothing)
   }
+  // otherwise let normal paste happen
 }
 
-// Run handler: collects codes and executes selection script in the active tab
+/**
+ * Run handler - collect all codes and execute selection in the active tab
+ */
 async function runHandler() {
   const inputs = document.querySelectorAll(".course-input input");
   const sections = Array.from(inputs)
@@ -155,7 +175,7 @@ async function runHandler() {
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab) {
-    alert("Open the UMS advising page first.");
+    alert("Please open your UMS advising page first.");
     return;
   }
 
@@ -166,7 +186,10 @@ async function runHandler() {
   });
 }
 
-// This runs inside the UMS page
+/**
+ * This function runs inside the UMS page context.
+ * It was kept identical to your previous logic but with 1s delay for safety.
+ */
 async function selectSections(desiredSections) {
   const delay = ms => new Promise(r => setTimeout(r, ms));
   for (let i = 0; i < desiredSections.length; i++) {
@@ -184,8 +207,7 @@ async function selectSections(desiredSections) {
       }
     });
     if (!found) console.log(`⚠️ [${i+1}/${desiredSections.length}] Not found: ${section}`);
-    await delay(1000); // safe 1s delay
+    await delay(1000);
   }
   console.log("🎉 All selections attempted.");
 }
- 

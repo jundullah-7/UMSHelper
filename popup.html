@@ -1,76 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
   <title>UMS Auto Selector</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
     body {
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Inter', sans-serif;
       margin: 20px;
-      background: #0f0f1a;
-      color: #00ffe1;
+      background: #FBFBFB;
+      color: #333;
       width: 320px;
     }
 
     h1 {
       text-align: center;
       font-size: 20px;
+      font-weight: 600;
       margin-bottom: 20px;
-      color: #00ffe1;
-      text-shadow: 0 0 10px #00ffe1;
+      letter-spacing: 0.5px;
     }
 
     .course-input {
       display: flex;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .course-input input {
       flex: 1;
-      padding: 8px 10px;
-      background: #1a1a2e;
-      border: 1px solid #00ffe1;
-      border-radius: 4px;
-      color: #00ffe1;
-      outline: none;
+      padding: 10px 14px;
+      border: 1px solid #E0E0E0;
+      border-radius: 6px;
       font-size: 14px;
-      box-shadow: 0 0 5px #00ffe1;
+      color: #333;
+      transition: border-color 0.2s;
     }
 
-    .course-input input::placeholder {
-      color: #00ffe1aa;
+    .course-input input:focus {
+      outline: none;
+      border-color: #8F95FF;
+      box-shadow: 0 0 8px rgba(143, 149, 255, 0.3);
     }
 
     .btn {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-top: 10px;
       border: none;
-      border-radius: 4px;
-      font-weight: bold;
+      border-radius: 6px;
+      font-weight: 600;
       cursor: pointer;
       font-size: 14px;
-      background: linear-gradient(45deg, #00ffe1, #7f00ff);
-      color: #0f0f1a;
-      box-shadow: 0 0 10px #7f00ff;
-      transition: transform 0.1s ease-in-out;
-    }
-
-    .btn:hover {
-      transform: scale(1.02);
-    }
-
-    .btn:active {
-      transform: scale(0.98);
+      transition: background-color 0.2s, box-shadow 0.2s;
     }
 
     #add-course {
-      background: linear-gradient(45deg, #7f00ff, #00ffe1);
-      color: #0f0f1a;
-      box-shadow: 0 0 10px #00ffe1;
+      background-color: #E8E8FF;
+      color: #4F4F7A;
     }
 
+    #add-course:hover {
+      background-color: #DBDBFF;
+    }
+
+    #run {
+      background-color: #8F95FF;
+      color: #FFF;
+      margin-top: 8px;
+    }
+
+    #run:hover {
+      background-color: #7B80E6;
+    }
   </style>
 </head>
 <body>
